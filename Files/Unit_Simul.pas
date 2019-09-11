@@ -279,7 +279,7 @@ if Form1.CB_slope.Checked then
     SG_Fit_Table.Cells[1, 1] := '0';
     SG_Fit_Table.Cells[1, 2] := '0';
     SG_Fit_Table.Cells[1, 3] := '0';
-    stWL:=210;
+    stWL:=270;
   end else
   begin
 

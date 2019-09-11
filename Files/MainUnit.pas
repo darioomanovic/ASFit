@@ -1,4 +1,4 @@
-unit MainUnit;
+﻿unit MainUnit;
 
 interface
 
@@ -249,6 +249,8 @@ type
     CheckBox4: TCheckBox;
     CheckBox15: TCheckBox;
     Edit12: TEdit;
+    Label11: TLabel;
+    Label12: TLabel;
     Procedure SaveIniFIle;
     Procedure OpenIniFIle;
     Procedure DoDownload(Source, Dest: String);
@@ -383,6 +385,7 @@ type
     procedure Performadditionalfitting1Click(Sender: TObject);
     procedure Splitter3CanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
+    procedure StaticText1Click(Sender: TObject);
   private
 
   protected
@@ -423,6 +426,7 @@ uses about, ConPlot,  Unit_Simul, Unit_warning;
 
 
 procedure ReadBinaryPE(FileName: string; var xLen: Int32; var xValue, yValue: array of double);
+
 var
   AFile: TMemoryStream;
   BR: TBinaryReader;
@@ -611,6 +615,42 @@ begin
   BR.Close;
   BR.Free;
   AFile.Free
+end;
+
+procedure ReadBinarySPC(FileName: string; var xLen: Int32; var xValue, yValue: array of double);
+var
+  AFile: TMemoryStream;
+  BR: TBinaryReader;
+  i,a, Nolines, nula: Integer;
+  line:Char;
+  znak:String;
+  conc: Double;
+begin
+AFile := TMemoryStream.Create;
+AFile.LoadFromFile(filename);
+BR := TBinaryReader.Create(AFile, TEncoding.ASCII, false);
+i:=0;
+//BR.BaseStream.Seek(19968,0);
+BR.BaseStream.Seek(10240,0);
+nula:=0;
+I:=0;
+ repeat
+  i:=i+1;
+  YValue[i]:=Br.Readdouble;
+  if YValue[i]=0 then nula:=nula+1 else nula:=0;
+
+ until nula=10;//XValue[i]=0;
+
+xLen:=i-10;
+
+//BR.BaseStream.Seek(10240,0);
+for I := 1 to 5 do Br.ReadDouble;
+
+for I := 1 to xLen do XValue[i]:=Br.ReadDouble;
+
+BR.Close;
+BR.Free;
+AFile.Free
 end;
 
 procedure ReadBinarySpecord(FileName: string; var xLen: Int32; var xValue, yValue: array of double);
@@ -1814,6 +1854,23 @@ begin
     np := i;
   end;
 
+  if lowercase(ExtractFileExt(Fname)) = '.spc' then
+  begin
+    ReadBinarySPC(Fname, nop, xbn, ybn);
+
+    np := nop;
+    i := 0;
+    for a := 1 to np do
+      if (xbn[a] <> 0) and (xbn[a] >= wlstart) and (xbn[a] <= wlend)then
+      begin
+        i := i + 1;
+        xtmp[i] := xbn[a];
+        ytmp[i] := ybn[a];
+      end;
+    np := i;
+  end;
+//ShowMessage(FloatToStr(np)+' '+FloatToStr(xbn[1]));
+
   if lowercase(ExtractFileExt(Fname)) = '.dat' then
   begin
     ReadBinarySpecord(Fname, nop, xbn, ybn);
@@ -1832,7 +1889,7 @@ begin
   end;
 
 
- if lowercase(ExtractFileExt(Fname)) = '.csv' then
+ if lowercase(ExtractFileExt(Fname)) = '.csv' then    //cary4
   begin
    AssignFile(f, Fname);
     reset(f);
@@ -1861,7 +1918,7 @@ begin
     end;
 
 
- if (lowercase(ExtractFileExt(Fname))<>'.sp') and (lowercase(ExtractFileExt(Fname))<>'.csv') and (lowercase(ExtractFileExt(Fname))<>'.dat') then
+ if (lowercase(ExtractFileExt(Fname))<>'.sp') and (lowercase(ExtractFileExt(Fname))<>'.csv') and (lowercase(ExtractFileExt(Fname))<>'.dat') and (lowercase(ExtractFileExt(Fname))<>'.spc') then
   begin
     AssignFile(f, Fname);
     reset(f);
@@ -1913,7 +1970,7 @@ begin
       end;
    //SHowMessage('sadas');
 
-    if ExtractFileExt(Fname) = '.asc' then
+    if ExtractFileExt(Fname) = '.asc' then   //PE ascii
       while (line <> 'XYDATA') do
       begin
         readln(f, line);
@@ -1932,7 +1989,7 @@ begin
         end;
       end;
     // ShowMessage(IntToStr(a));
-    if a=0 then  reset(f);
+    //if a=0 then  reset(f);
    //SHowMessage(FloatToStr(a));
    i := 0;
     while not eof(f) do
@@ -1947,7 +2004,7 @@ begin
 
       Xt:=StrToFloat(data[0]);
       Yt:=StrToFloat(data[1]);
-      //if i=0 then ShowMessage(data[0]+' '+data[1]);
+
       if (xt <> 0) and (abs(xt) >= wlstart) and (abs(xt) <= wlend)then
       begin
         i := i + 1;
@@ -1971,7 +2028,7 @@ FS.DecimalSeparator:= '.';
 FS.ThousandSeparator := ',';
 System.SysUtils.FormatSettings := FS;
 
-  //ShowMessage(IntToStr(np));
+ // ShowMessage(IntToStr(np));
  // PathL := StrToFloat(LabeledEdit12.text);
   // ShowMessage(intToStr(Nopoints));
   if xtmp[5] > xtmp[10] then
@@ -2464,6 +2521,7 @@ CheckBox14.Enabled:=CB_Fit_Gauss.Checked;
 if CB_Fit_Gauss.Checked=false  then CheckBox14.Checked:=False;
 //CheckBox15.Enabled:=CB_Fit_Gauss.Checked;
 SpinEdit2.Visible:=CB_Fit_Gauss.Checked;
+StaticText1Click(Self);
   if CB_Fit_Gauss.Checked then
   begin
     LabeledEdit6.text := DefGLW;//'245';
@@ -2523,7 +2581,7 @@ if CB_slope.Checked then
 
 CB_Fit_a0.Enabled:=not CB_slope.Checked;
 CB_Fit_a0.Checked:=not CB_slope.Checked;
-
+StaticText1Click(Self);
 end;
 
 procedure TForm1.CB_TransClick(Sender: TObject);
@@ -3315,7 +3373,7 @@ begin
       XLApp.Visible := false
     else
       XLApp.Visible := True;
-    // Workbook hinzuf�gen
+    // Workbook hinzufügen
     XLApp.DisplayAlerts := false;
     for m := 1 to BookCount do
     begin
@@ -3337,7 +3395,7 @@ begin
     else
       SheetRowCount := 65536;
 
-    // Sheets bef�llen
+    // Sheets befüllen
     for m := 1 to BookCount do
     begin
       for n := 1 to SheetCount do
@@ -3360,7 +3418,7 @@ begin
           RefToCell(SheetRowCount, SheetColCount)].Select;
         // XLApp.Selection.NumberFormat := '@';
         XLApp.Workbooks[m].Worksheets[n].Range['A1'].Select;
-        // Daten dem Excelsheet �bergeben
+        // Daten dem Excelsheet übergeben
         Sheet := XLApp.Workbooks[m].Worksheets[n];
         Sheet.Range[RefToCell(1, 1), RefToCell(SheetRowCount, SheetColCount)
           ].Value := Data;
@@ -3582,6 +3640,27 @@ procedure TForm1.Splitter3CanResize(Sender: TObject; var NewSize: Integer;
   var Accept: Boolean);
 begin
 RChart2.Width := round(Panel8.Width / 2) + 3;
+end;
+
+procedure TForm1.StaticText1Click(Sender: TObject);
+var
+lab, l0,l1,l2,l3,l4: String;
+begin
+lab:='';
+l0:='a(λ) = ';
+
+l2:='*exp(−S(λ−λ0))';
+l3:=' + K';
+l4:='n*Gauss';
+lab:=l0;
+if CB_Fit_a0.checked then l1:='a(λ0)' else l1:='abs';
+if CB_Fit_K.Checked then l3:=' + K' else l3:='';
+if CB_Slope.Checked=false then lab:=lab+l1+l2;
+if CB_Fit_Gauss.Checked then lab:=lab+' + '+l4;
+if CB_Fit_K.Checked then lab:=lab+l3;
+if CB_Slope.Checked then Lab:=l0+l4+l3;;
+
+StaticText1.Caption:=lab;
 end;
 
 procedure TForm1.StringGrid1Click(Sender: TObject);
@@ -3926,7 +4005,8 @@ begin
   end; }
  // System.Sysutils.Formatsettings.DecimalSeparator:=',';
 
- version:=1003;
+ version:=1005;
+ //SHowMEssage(getfileversion(ParamStr(0)));
 
   Form1.Width := Screen.Width;
   Form1.Height := Screen.Height - 40;
@@ -3943,9 +4023,9 @@ begin
   StringGrid1.Cells[0, 0] := 'No';
   StringGrid1.Cells[1, 0] := 'File Name';
   StringGrid1.Cells[2, 0] := 'S @ 275';
-  StringGrid1.Cells[3, 0] := '�SE';
+  StringGrid1.Cells[3, 0] := '±SE';
   StringGrid1.Cells[4, 0] := 'S @ 350';
-  StringGrid1.Cells[5, 0] := '�SE';
+  StringGrid1.Cells[5, 0] := '±SE';
   StringGrid1.Cells[6, 0] := 'a@275(fit)';
   StringGrid1.Cells[7, 0] := 'a@350 (fit)';
   StringGrid1.Cells[8, 0] := 'WL_1';
@@ -4107,8 +4187,10 @@ newversion:Boolean;
 begin
 newversion:=false;
 //Source:='https://mojoblak.srce.hr/public.php?service=files&t=79aa18620b5effda9d8a940e1cee188c&download';
-Source:='https://mojoblak.srce.hr/public.php?service=files&t=79aa18620b5effda9d8a940e1cee188c';
-Source:='https://mojoblak.srce.hr/public.php?service=files&t=ce948ba7fe3989cf8c95c2b505eb098c&path=%2FAsfit&files=ASFit.ver&download';
+//Source:='https://mojoblak.srce.hr/public.php?service=files&t=79aa18620b5effda9d8a940e1cee188c';
+//Source:='https://mojoblak.srce.hr/public.php?service=files&t=ce948ba7fe3989cf8c95c2b505eb098c&path=%2FAsfit&files=ASFit.ver&download';
+//
+Source:='https://drive.google.com/uc?export=download&id=1n0MyM2ND_InuYcDNRlY84QIMGONYmvF8';
 Dest:=ExtractFilePath(ParamStr(0))+'Ver.tmp';
 DoDownload(source, dest);
 memo4.Clear;
@@ -4121,7 +4203,7 @@ if newversion then
  begin
  ShowMessage('New version of ASFit exists!'+#13+#13+'You will be redirected to download website.');
   ShellExecute(0, 'OPEN',
-    PChar('https://sites.google.com/site/daromasoft/home/spectral-slope'), '',
+    PChar('https://sites.google.com/site/daromasoft/home/asfit'), '',
     '', SW_SHOWNORMAL);
  end else ShowMessage('You have the most recent version of ASFit !');
 end;
@@ -4439,10 +4521,12 @@ begin
   // VectorSize:=round(VectorSize/2);
  np:=NoKraj-NoPoc+1;
  fkt:=1;
- if (YpPik[NoPoc+10]>10) and (YpPik[NoPoc+10]<1000) then fkt:=100;
- if (YpPik[NoPoc+10]<10) and (YpPik[NoPoc+10]>1) then fkt:=1000;
- if (YpPik[NoPoc+10]<1) then fkt:=10000;
- if (YpPik[NoPoc+10]<0.1) then fkt:=100000;
+ if (YpPik[NoPoc+10]>10) and (YpPik[NoPoc+10]<1000) then fkt:=1;//100;
+ if (YpPik[NoPoc+10]<10) and (YpPik[NoPoc+10]>1) then fkt:=10;//1000;
+ if (YpPik[NoPoc+10]<1) then fkt:=100;//10000;
+ if (YpPik[NoPoc+10]<0.1) then fkt:=1000;//100000;
+
+//ShowMessage(FloatToStr(fkt));
 
   if CB_Fit_Gauss.Checked = false then
     brojPikova := 0;
@@ -4491,7 +4575,7 @@ if NoGauss=0 then bc:=False;
     begin
       S[i, 0] := 0;
       S[i, 1] := 0;
-      S[i, 2] := 1000000;
+      S[i, 2] := 10000;
     end
   else
     for i := 0 to ParamCount - 1 do  S[i] := 0;
@@ -4506,7 +4590,7 @@ if NoGauss=0 then bc:=False;
     S[0, 1] := abs(YPik[0] * 0.2);;
     S[0, 2] := abs(YPik[0] * 2);
     S[1, 1] := 0.005;
-    S[1, 2] := 0.060;
+    S[1, 2] := 0.050;
     S[2, 1] := -abs(YPik[VectorSize - 1] * 1.5);//0;
     S[2, 2] := abs(YPik[VectorSize - 1] * 1.5);
     if CB_Fit_a0.Checked = false then S[0, 0] := -1;
@@ -4612,7 +4696,7 @@ if NoGauss=0 then bc:=False;
   end;
 
 
-  str2 := floatToStr(XPik[0]);
+str2 := floatToStr(XPik[0]);//floatToStr(round((XPik[0]+XPik[VectorSize - 1])/2));
   IzrazGauss := '';
   if NoGauss > 0 then
   begin
@@ -4623,7 +4707,7 @@ if NoGauss=0 then bc:=False;
   OleInitialize(NIL);
 
   izraz := 'p1*exp(-p2*(cx-' + str2 + '))+p3' + IzrazGauss;
- //ShowMessage(izraz);
+//ShowMessage(izraz);
   Panel2.Caption := izraz;
   try
     Fitter := CreateOleObject('Fitter.LMFitter');
@@ -4647,11 +4731,11 @@ if NoGauss=0 then bc:=False;
      else Fitter.Iterations := SpinEdit3.Value*4;
 
   if CB_Slope.Checked then Fitter.Iterations := SpinEdit3.Value*4;
+  if CB_Fit_Gauss.Checked=False then Fitter.Iterations := SpinEdit3.Value*4;
 
   Fitter.Options := O;
    if weight then Fitter.WeightType:=1 else Fitter.WeightType:=0; // <- this step is optional
-  // ShowMessage('prosao');
-  // TestFitterEventSink:=TTestFitterEventSink.Create(Fitter);
+
 
   if Fitter.LMFit then
   begin

@@ -2696,12 +2696,19 @@ object Form1: TForm1
           ExplicitTop = 92
         end
         object StaticText1: TStaticText
-          Left = 16
-          Top = 20
-          Width = 219
+          Left = 10
+          Top = 18
+          Width = 168
           Height = 17
-          Caption = 'a('#955') = a('#955'0)*exp('#8722'S('#955#8722#955'0)) + K + n*Gauss'
+          Caption = 'a('#955') = a('#955'0)*exp('#8722'S('#955#8722#955'0))'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
           TabOrder = 0
+          OnClick = StaticText1Click
         end
         object CB_Fit_K: TCheckBox
           Left = 6
@@ -2710,10 +2717,11 @@ object Form1: TForm1
           Height = 17
           Caption = 'Fit K (abs. at high-end; K=0 if not  fitted)'
           TabOrder = 1
+          OnClick = StaticText1Click
         end
         object CB_Fit_Gauss: TCheckBox
           Left = 6
-          Top = 101
+          Top = 99
           Width = 133
           Height = 17
           Caption = 'Fit Gauss peaks, n='
@@ -2730,7 +2738,7 @@ object Form1: TForm1
           Visible = False
         end
         object SpinEdit2: TSpinEdit
-          Left = 118
+          Left = 119
           Top = 98
           Width = 32
           Height = 22
@@ -2752,7 +2760,7 @@ object Form1: TForm1
         end
         object CB_Slope: TCheckBox
           Left = 6
-          Top = 40
+          Top = 39
           Width = 164
           Height = 17
           Caption = 'No exponential fit (only Gauss)'
@@ -2768,6 +2776,7 @@ object Form1: TForm1
           Checked = True
           State = cbChecked
           TabOrder = 7
+          OnClick = StaticText1Click
         end
         object Button6: TButton
           Left = 16
@@ -2840,7 +2849,21 @@ object Form1: TForm1
           Top = 89
           Width = 148
           Height = 13
-          Caption = 'Determine abosrbance at WLs:'
+          Caption = 'Determine absorbance at WLs:'
+        end
+        object Label11: TLabel
+          Left = 68
+          Top = 18
+          Width = 20
+          Height = 13
+          Caption = '('#955'0)'
+        end
+        object Label12: TLabel
+          Left = 169
+          Top = 18
+          Width = 20
+          Height = 13
+          Caption = '('#955'0)'
         end
         object LabeledEdit3: TLabeledEdit
           Left = 72
@@ -2879,9 +2902,9 @@ object Form1: TForm1
           Text = '254'
         end
         object LabeledEdit7: TLabeledEdit
-          Left = 64
-          Top = 46
-          Width = 33
+          Left = 65
+          Top = 57
+          Width = 25
           Height = 21
           EditLabel.Width = 51
           EditLabel.Height = 13
@@ -2893,9 +2916,9 @@ object Form1: TForm1
           OnChange = LabeledEdit6Change
         end
         object LabeledEdit6: TLabeledEdit
-          Left = 64
-          Top = 19
-          Width = 33
+          Left = 65
+          Top = 32
+          Width = 25
           Height = 21
           EditLabel.Width = 49
           EditLabel.Height = 13
@@ -2907,9 +2930,9 @@ object Form1: TForm1
           OnChange = LabeledEdit6Change
         end
         object LabeledEdit9: TLabeledEdit
-          Left = 165
-          Top = 46
-          Width = 33
+          Left = 167
+          Top = 57
+          Width = 25
           Height = 21
           EditLabel.Width = 51
           EditLabel.Height = 13
@@ -2920,9 +2943,9 @@ object Form1: TForm1
           Text = '400'
         end
         object LabeledEdit8: TLabeledEdit
-          Left = 165
-          Top = 21
-          Width = 33
+          Left = 167
+          Top = 32
+          Width = 25
           Height = 21
           EditLabel.Width = 49
           EditLabel.Height = 13
@@ -6431,10 +6454,6 @@ object Form1: TForm1
         object TabSheet2: TTabSheet
           Caption = '3D Plot'
           ImageIndex = 1
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Plot3D1: TPlot3D
             Left = 0
             Top = 0
@@ -6502,10 +6521,6 @@ object Form1: TForm1
           Caption = 'Additional file data (ASCII)'
           ImageIndex = 2
           TabVisible = False
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Memo3: TMemo
             Left = 0
             Top = 0
@@ -6531,9 +6546,10 @@ object Form1: TForm1
   end
   object OpenDialog1: TOpenDialog
     Filter = 
-      'Bin/Text/ASCII file (*.sp;*.txt; *.asc;*.dat)|*.txt; *.asc;*.slp' +
-      ';*.sp; *.csv;*.oew;*.vmd;*.exg;*.dat|PE ASCII file (*.asc)|*.asc' +
-      '|PE Bin file (*.sp)|*.sp|Specord Jena (*.dat)|*.dat|*.*|*.*'
+      'Bin/Text/ASCII file (*.sp;*.spc;*.txt; *.asc;*.dat)|*.txt; *.asc' +
+      ';*.slp;*.sp; *.csv;*.oew;*.vmd;*.exg;*.dat;*.spc|PE ASCII file (' +
+      '*.asc)|*.asc|PE Bin file (*.sp)|*.sp|Specord Jena (*.dat)|*.dat|' +
+      'SHIMADZU( *.spc)|*.spc|*.*|*.*'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
     Title = 'Load spectra'
     Left = 984
